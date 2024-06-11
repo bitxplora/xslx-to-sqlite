@@ -17,6 +17,12 @@ schema = '''
               dov TEXT
             );
 
+            CREATE TABLE IF NOT EXISTS exchange (
+              code TEXT,
+              name TEXT,
+              rate REAL,
+            );
+
             CREATE VIRTUAL TABLE IF NOT EXISTS tariff_fts USING FTS5 (
               cetcode,
               description,
@@ -62,3 +68,6 @@ readfile.rename(columns={'CET Code': 'cetcode', 'Description': 'description',
                          'SU': 'su', 'ID': 'id', 'VAT': 'vat', 'LVY': 'lvy',
                          'EXC': 'exc','DOW': 'dow'}, inplace=True)
 readfile.to_sql('tariff',conn, if_exists='append', index=False)
+
+conn.commit();
+conn.close();
