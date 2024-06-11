@@ -63,11 +63,11 @@ schema = '''
 '''
 cursor.executescript(schema)
 
-readfile = pd.read_excel(r'tariff.xlsx')
-readfile.rename(columns={'CET Code': 'cetcode', 'Description': 'description',
+tariff_file = pd.read_excel(r'tariff.xlsx')
+tariff_file.rename(columns={'CET Code': 'cetcode', 'Description': 'description',
                          'SU': 'su', 'ID': 'id', 'VAT': 'vat', 'LVY': 'lvy',
                          'EXC': 'exc','DOW': 'dow'}, inplace=True)
-readfile.to_sql('tariff',conn, if_exists='append', index=False)
+tariff_file.to_sql('tariff',conn, if_exists='append', index=False)
 
 conn.commit();
 conn.close();
