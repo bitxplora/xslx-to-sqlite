@@ -1,16 +1,11 @@
 import pandas as pd
 import sqlite3
-# from sqlalchemy import create_engine
-
-# engine = create_engine('sqlite:///tariff.db')
 
 conn = sqlite3.connect('tariff.db')
 cursor = conn.cursor()
 
 
-schema = '''DROP TABLE IF EXISTS "tariff";
-            DROP TABLE IF EXISTS tariff_fts;
-
+schema = '''
             CREATE TABLE IF NOT EXISTS tariff(
               cetcode TEXT,
               description TEXT,
@@ -66,6 +61,4 @@ readfile = pd.read_excel(r'tariff.xlsx')
 readfile.rename(columns={'CET Code': 'cetcode', 'Description': 'description',
                          'SU': 'su', 'ID': 'id', 'VAT': 'vat', 'LVY': 'lvy',
                          'EXC': 'exc','DOW': 'dow'}, inplace=True)
-# readfile.to_csv(r'tariff.csv', index=False, header=True)
 readfile.to_sql('tariff',conn, if_exists='append', index=False)
-# df = pd.DataFrame(pd.read_csv(r'tariff.csv'))
