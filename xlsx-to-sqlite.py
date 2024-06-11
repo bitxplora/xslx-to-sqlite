@@ -69,5 +69,9 @@ tariff_file.rename(columns={'CET Code': 'cetcode', 'Description': 'description',
                          'EXC': 'exc','DOW': 'dow'}, inplace=True)
 tariff_file.to_sql('tariff',conn, if_exists='append', index=False)
 
+exchange_file = pd.read_excel(r'exchange.xls')
+exchange_file.rename(columns={'Code': 'code', 'Name': 'name', 'Rate': 'rate'}, inplace=True)
+exchange_file.to_sql('exchange',conn, if_exists='append', index=False)
+
 conn.commit();
 conn.close();
