@@ -1,0 +1,71 @@
+import pandas as pd
+import sqlite3
+# from sqlalchemy import create_engine
+
+# engine = create_engine('sqlite:///tariff.db')
+
+conn = sqlite3.connect('tariff.db')
+cursor = conn.cursor()
+
+
+schema = '''DROP TABLE IF EXISTS "tariff";
+            DROP TABLE IF EXISTS tariff_fts;
+
+            CREATE TABLE IF NOT EXISTS tariff(
+              cetcode TEXT,
+              description TEXT,
+              su TEXT,
+              id INTEGER,
+              vat REAL,
+              lvy INTEGER,
+              exc TEXT,
+              dov TEXT
+            );
+
+            CREATE VIRTUAL TABLE IF NOT EXISTS tariff_fts USING FTS5 (
+              cetcode,
+              description,
+              id,
+              vat,
+              lvy
+            );
+
+            CREATE TRIGGER IF NOT EXISTS insert_tariff_fts
+              AFTER insert
+              ON tariff
+            BEGIN
+              INSERT INTO tariff_fts (cetcode, description, id, vat, lvy)
+              VALUES (NEW.cetcode, NEW.description, NEW.id, NEW.vat, NEW.lvy);
+            END;
+
+            CREATE TRIGGER IF NOT EXISTS update_tariff_fts
+              AFTER update
+              ON tariff
+            BEGIN
+              UPDATE tariff_fts
+              SET
+                cetcode = NEW.cetcode,
+                description = NEW.description,
+                id = NEW.id,
+                vat = NEW.vat,
+                lvy = NEW.lvy
+                WHERE cetcode = NEW.cetcode;
+            END;
+
+            CREATE TRIGGER IF NOT EXISTS delete_tariff_fts
+              AFTER delete
+              ON tariff
+            BEGIN
+              DELETE FROM tariff_fts
+              WHERE cetcode = OLD.cetcode;
+            END;
+'''
+cursor.executescript(schema)
+
+readfile = pd.read_excel(r'tariff.xlsx')
+readfile.rename(columns={'CET Code': 'cetcode', 'Description': 'description',
+                         'SU': 'su', 'ID': 'id', 'VAT': 'vat', 'LVY': 'lvy',
+                         'EXC': 'exc','DOW': 'dow'}, inplace=True)
+# readfile.to_csv(r'tariff.csv', index=False, header=True)
+readfile.to_sql('tariff',conn, if_exists='append', index=False)
+# df = pd.DataFrame(pd.read_csv(r'tariff.csv'))
